@@ -1,0 +1,15 @@
+{
+  "id": "com.github.dasilva333.transmissionic",
+  "version": "1.0.0",
+  "type": "web",
+  "title": "Transmissionic",
+  "appDescription": "Modern, fast remote manager for Transmission BitTorrent daemon on LG webOS TVs",
+  "iconUri": "https://raw.githubusercontent.com/dasilva333/webos-transmissionic/main/assets/icon160.png",
+  "sourceUrl": "https://github.com/dasilva333/webos-transmissionic",
+  "rootRequired": false,
+  "ipkUrl": "https://github.com/dasilva333/webos-transmissionic/releases/download/v1.0.0/com.github.dasilva333.transmissionic_1.0.0_all.ipk",
+  "ipkHash": {
+    "sha256": "515ce949f480ffa9b79a12ba9894d3f4417bdc8885a7e91f27b850b4172a2ced"
+  },
+  "ipkSize": 751626
+}

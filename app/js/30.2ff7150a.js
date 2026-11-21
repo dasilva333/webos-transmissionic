@@ -1,0 +1,13 @@
+"use strict";
+(self["webpackChunktransmissionic"] = self["webpackChunktransmissionic"] || []).push([[30], { 3030: function(s, n, e) {
+  e.r(n), e.d(n, { SplashScreenWeb: function() {
+    return i;
+  } });
+  var c = e(9895);
+  class i extends c.Uw {
+    async show(s2) {
+    }
+    async hide(s2) {
+    }
+  }
+} }]);
