@@ -790,6 +790,7 @@
         return e3;
       }
       readToken(e3) {
+        if (e3 && e3._sessionTokenFromBody) return e3._sessionTokenFromBody;
         let t3 = "";
         return e3.headers && "undefined" !== typeof e3.headers["x-transmission-session-id"] ? t3 = e3.headers["x-transmission-session-id"] : e3.headers && "undefined" !== typeof e3.headers["X-Transmission-Session-Id"] ? t3 = e3.headers["X-Transmission-Session-Id"] : e3.headers && e3.headers.get && null != e3.headers.get("x-transmission-session-id") && (t3 = e3.headers.get("x-transmission-session-id")), t3;
       }
@@ -866,7 +867,7 @@
         else {
           if (409 !== r2.status) throw Error("HTTP " + r2.status);
           if (this.sessionToken = this.readToken(r2), !a3) throw Error("Invalid token");
-          s2 = this.rpcCall(e3, t3, false);
+          s2 = await this.rpcCall(e3, t3, false);
         }
         if (s2.result && "success" != s2.result) throw Error(s2.result);
         return s2;
@@ -890,11 +891,23 @@
       }
       async browserRequest(e3, t3, a3) {
         let n3 = {};
-        return t3.body = JSON.stringify(a3), await this.timeout(1e3 * this.options.timeout, fetch(e3, t3)).then(((e4) => {
-          n3 = e4;
-        })).catch(((e4) => {
+        t3.body = JSON.stringify(a3);
+        try {
+          const resp = await this.timeout(1e3 * this.options.timeout, fetch(e3, t3));
+          n3 = resp;
+          if (resp.status === 409) {
+            try {
+              const text = await resp.text();
+              const match = text.match(/X-Transmission-Session-Id:\s*([a-zA-Z0-9]+)/);
+              if (match) n3._sessionTokenFromBody = match[1];
+            } catch(e) {}
+          } else if (resp.json && resp.ok) {
+            n3.data = await resp.json();
+          }
+        } catch(e4) {
           n3.errorMessage = "TypeError: Failed to fetch" == e4 ? "Unable to reach host" : e4;
-        })), n3.json && n3.ok && (n3.data = await n3.json()), n3;
+        }
+        return n3;
       }
       getRequestUrl() {
         let e3 = this.options.https ? "https" : "http";
@@ -923,7 +936,7 @@
     } });
     a2(7658);
     var n2 = a2(4870), l = a2(3640), o = a2(4571), s = a2(1867);
-    const i = { colorScheme: "default", language: "default", refreshInterval: 5, timeout: 10, orderBy: "addedDate", reverse: true, selectedServer: 0, useBits: true, expandMenu: true, ipFlags: false, openMagnetLinks: false, searchByName: true, searchByDirectory: true, selectedPreset: "", rememberSelectedPreset: false, compactMode: false, showTrackerList: false }, r = { name: "Default", host: window.location.hostname, port: window.location.port || ("https:" === window.location.protocol ? 443 : 80), https: "https:" === window.location.protocol }, d = [r], c = { state: (0, n2.qj)({ ...i }), getLanguage() {
+    const i = { colorScheme: "default", language: "default", refreshInterval: 5, timeout: 10, orderBy: "addedDate", reverse: true, selectedServer: 0, useBits: true, expandMenu: true, ipFlags: false, openMagnetLinks: false, searchByName: true, searchByDirectory: true, selectedPreset: "", rememberSelectedPreset: false, compactMode: false, showTrackerList: false }, r = { name: "Windows Torrent Server", host: (window.location.hostname || "10.0.0.91"), port: (window.location.port ? parseInt(window.location.port) : 9091), https: false }, d = [r], c = { state: (0, n2.qj)({ ...i }), getLanguage() {
       return "default" == this.state.language ? navigator.language : this.state.language;
     }, setValue(e3, t3, a3 = false) {
       null != t3 && (Object(this.state)[e3] = t3), a3 && this.saveKey(e3);
@@ -934,7 +947,7 @@
       }));
     }, async loadDefaultSettings() {
       if (!(0, l.a)("capacitor") && !(0, l.a)("electron")) {
-        const e3 = await fetch("default.json").then(((e4) => e4.json())).catch((() => {
+        const e3 = await Promise.resolve({ servers: [{ name: "Windows Torrent Server", host: "10.0.0.91", port: 9091, https: false }] }).catch((() => {
         }));
         if (e3) for (const t3 in e3) "servers" == t3 ? (d.length = 0, e3[t3].forEach(((e4) => {
           d.push(Object.assign({}, r, e4));
@@ -948,10 +961,18 @@
       this.state[e3] != i[e3] || "selectedServer" == e3 ? o.u.set({ key: e3, value: Object(this.state)[e3].toString() }) : o.u.remove({ key: e3 });
     }, async loadServerList() {
       let e3 = [];
-      return (0, l.a)("capacitor") || (0, l.a)("electron") || (e3 = [...d]), await s.k.get({ key: "servers" }).then(((t3) => {
-        e3 = t3.value && "[]" != t3.value ? JSON.parse(t3.value) : e3;
-      })).catch((() => {
-      })), e3;
+      try {
+        const raw = localStorage.getItem("CapacitorStorage.servers") || localStorage.getItem("servers");
+        if (raw && raw !== "[]") e3 = JSON.parse(raw);
+      } catch(err) {}
+      if (!e3 || !e3.length) {
+        try {
+          const res = await s.k.get({ key: "servers" });
+          if (res && res.value && res.value !== "[]") e3 = JSON.parse(res.value);
+        } catch(err) {}
+      }
+      if (!e3 || !e3.length) e3 = [...d];
+      return e3;
     }, saveServerList(e3) {
       s.k.set({ key: "servers", value: JSON.stringify(e3) });
     }, async loadPresets() {

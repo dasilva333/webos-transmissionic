@@ -1,0 +1,32 @@
+/* TV D-Pad Spatial Navigation Focus Styles */
+.dpad-focused {
+  outline: 3px solid #428cff !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 14px rgba(66, 140, 255, 0.55) !important;
+  position: relative;
+  z-index: 10;
+}
+
+ion-item.dpad-focused,
+.torrent.dpad-focused {
+  outline-offset: -3px !important;
+  background-color: rgba(66, 140, 255, 0.14) !important;
+  --background: rgba(66, 140, 255, 0.14);
+}
+
+ion-button.dpad-focused,
+button.dpad-focused {
+  outline-offset: 2px !important;
+  transform: scale(1.04);
+  transition: transform 0.1s ease;
+}
+
+ion-segment-button.dpad-focused {
+  outline-offset: -3px !important;
+  background-color: rgba(66, 140, 255, 0.18) !important;
+}
+
+/* Ensure Ionic doesn't hide focus outlines on TV */
+.dpad-focused:focus {
+  outline: 3px solid #428cff !important;
+}
