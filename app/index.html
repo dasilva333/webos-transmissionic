@@ -4,6 +4,9 @@
 <script>
   (function() {
     try {
+      if (!localStorage.getItem('CapacitorStorage.colorScheme')) {
+        localStorage.setItem('CapacitorStorage.colorScheme', 'dark');
+      }
       var existing = localStorage.getItem('CapacitorStorage.servers');
       if (!existing || existing === '[]') {
         var defaultServers = [{
@@ -19,5 +22,10 @@
       console.warn('Seed server config error:', e);
     }
   })();
+  document.addEventListener("webOSRelaunch", function() {
+    if (window.PalmSystem && window.PalmSystem.activate) {
+      window.PalmSystem.activate();
+    }
+  });
 </script>
-</head><body class="loading"><div id="app"></div></body></html>
+</head><body class="loading dark"><div id="app"></div></body></html>

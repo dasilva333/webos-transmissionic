@@ -36,7 +36,12 @@
     if (!el || !el.getBoundingClientRect) return false;
     if (el.disabled || el.hasAttribute('disabled')) return false;
     if (el.classList.contains('button-disabled') || el.classList.contains('item-disabled')) return false;
-    if (el.closest('.ion-page-hidden, [hidden], .overlay-hidden, [aria-hidden="true"]')) return false;
+    if (el.closest('.ion-page-hidden, [hidden], .overlay-hidden')) return false;
+
+    var ariaHiddenAncestor = el.closest('[aria-hidden="true"]');
+    if (ariaHiddenAncestor && !(ariaHiddenAncestor.tagName === 'ION-MENU-TOGGLE' && ariaHiddenAncestor.closest('ion-menu'))) {
+      return false;
+    }
 
     // Skip menu items if menu is collapsed / off-screen
     var menu = el.closest('ion-menu');
